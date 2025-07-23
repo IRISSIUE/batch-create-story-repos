@@ -8,6 +8,7 @@ GITHUB_TOKEN = None
 
 def login_to_github():
     """Authenticate to GitHub using a personal access token."""
+    global GH, GITHUB_TOKEN
     GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
     if not GITHUB_TOKEN:
         print("Error: GITHUB_TOKEN is not set in your environment.")
@@ -43,7 +44,6 @@ def create_repo_from_template(template_path, new_repo_owner, new_repo_name, new_
         "description": new_repo_description,
         "private": False
     }
-
     response = requests.post(url, headers=headers, json=data)
 
     if response.status_code == 201:
@@ -51,6 +51,7 @@ def create_repo_from_template(template_path, new_repo_owner, new_repo_name, new_
     else:
         print("Failed to create repo:", response.status_code)
         print(response.json())
+        return None
 
     new_repo = GH.get_repo(f"{new_repo_owner}/{new_repo_name}")
     return new_repo

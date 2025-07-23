@@ -11,8 +11,7 @@ GOOGLE_CREDS = None
 def authenticate_google_user():
     """Authenticate using OAuth2 user credentials"""
     global GOOGLE_CREDS
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
-              'https://www.googleapis.com/auth/drive.readonly']
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
     creds = None
     
     print("Authenticating Google user...")
@@ -100,12 +99,19 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values):
     converted_data = []
     for row in sheet_values:
         if row:  
-            repo_name = sanitize_repo_name(row[0])  # First column is the repository name
+            original_name = row[0].strip() if row[0] else "" # First column is the repository name
+            repo_name = sanitize_repo_name(row[0])  
             student_names = convert_author_names_to_list(row[1:]) # Subsequent columns are one column per author
-            converted_data.append([repo_name, student_names])
+    
+            repo_data = {
+                "name": original_name,
+                "repo-name": repo_name,
+                "authors": student_names
+            }
+            converted_data.append(repo_data)
     return converted_data
 
-def fetch_names_from_google_sheet(google_sheet_id):
+def fetch_repo_data_from_google_sheet(google_sheet_id):
     print("Reading repository names from Google Sheet...")
 
     if GOOGLE_CREDS is None:

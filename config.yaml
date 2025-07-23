@@ -3,7 +3,8 @@ github:
   template_repo_name: scrolly-story-generator
   new_repo_owner: iris-stories
   new_repo_name_prefix: codes2029
-  new_repo_description_prefix: "Scrolly Story for CODES 2029 cohort"
+  # The GitHub repo description will have the input project name appended to the prefix 
+  new_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
 
 google:
   source_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"

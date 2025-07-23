@@ -16,9 +16,9 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["project-alpha", "John Smith, Jane Doe, Bob Wilson"],
-        ["project-beta", "Alice Johnson, Charlie Brown"],
-        ["project-gamma", "David Lee"]
+        {"name": "Project Alpha", "repo-name": "project-alpha", "authors": "John Smith, Jane Doe, Bob Wilson"},
+        {"name": "Project Beta", "repo-name": "project-beta", "authors": "Alice Johnson, Charlie Brown"},
+        {"name": "Project Gamma", "repo-name": "project-gamma", "authors": "David Lee"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 1 passed: Normal case with multiple rows and authors")
@@ -31,9 +31,9 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["project-alpha", "John Smith, Jane Doe"],
-        ["project-beta", "Alice Johnson"],
-        ["project-gamma", "David Lee"]
+        {"name": "project-alpha", "repo-name": "project-alpha", "authors": "John Smith, Jane Doe"},
+        {"name": "Project Beta", "repo-name": "project-beta", "authors": "Alice Johnson"},
+        {"name": "project-gamma", "repo-name": "project-gamma", "authors": "David Lee"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 2 passed: Rows with empty cells filtered out")
@@ -45,8 +45,8 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["project-alpha", "John S. Smith, Jane Doe, Bob Wilson"],
-        ["project-beta", "Alice Johnson, Charlie Brown"]
+        {"name": "project-alpha", "repo-name": "project-alpha", "authors": "John S. Smith, Jane Doe, Bob Wilson"},
+        {"name": "Project Beta", "repo-name": "project-beta", "authors": "Alice Johnson, Charlie Brown"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 3 passed: Extra whitespace trimmed")
@@ -57,7 +57,7 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["solo-project", "John Smith"]
+        {"name": "Solo Project", "repo-name": "solo-project", "authors": "John Smith"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 4 passed: Single row with single author")
@@ -68,12 +68,12 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["empty-project", ""]
+        {"name": "Empty Project", "repo-name": "empty-project", "authors": ""}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 5 passed: Row with only project name")
 
-       # Test 6: Empty rows mixed with data rows
+    # Test 6: Empty rows mixed with data rows
     sheet_values = [
         ["project-alpha", "John Smith", "Jane Doe"],
         [],  # Empty row
@@ -83,9 +83,9 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["project-alpha", "John Smith, Jane Doe"],
-        ["project-beta", "Alice Johnson"],
-        ["project-gamma", "David Lee"]
+        {"name": "project-alpha", "repo-name": "project-alpha", "authors": "John Smith, Jane Doe"},
+        {"name": "Project Beta", "repo-name": "project-beta", "authors": "Alice Johnson"},
+        {"name": "Project Gamma", "repo-name": "project-gamma", "authors": "David Lee"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 6 passed: Empty rows filtered out")
@@ -104,8 +104,7 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 8 passed: Empty sheet values")
     
-        # Test 9: Special characters in project names
-
+    # Test 9: Variable number of author columns
     sheet_values = [
         ["project-alpha", "John S. Smith", "Jane Doe", "Bob Wilson", "Mary Johnson"],
         ["Project     Beta", "Alice Johnson"],
@@ -113,9 +112,9 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["project-alpha", "John S. Smith, Jane Doe, Bob Wilson, Mary Johnson"],
-        ["project-beta", "Alice Johnson"],
-        ["project-gamma", "David Lee, Sarah Connor, Tom Hardy"]
+        {"name": "project-alpha", "repo-name": "project-alpha", "authors": "John S. Smith, Jane Doe, Bob Wilson, Mary Johnson"},
+        {"name": "Project     Beta", "repo-name": "project-beta", "authors": "Alice Johnson"},
+        {"name": "Project Gamma", "repo-name": "project-gamma", "authors": "David Lee, Sarah Connor, Tom Hardy"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 9 passed: Variable number of author columns")
@@ -127,11 +126,12 @@ def test_convert_sheet_values_to_repo_names_and_authors():
     ]
     result = convert_sheet_values_to_repo_names_and_authors(sheet_values)
     expected = [
-        ["project-alpha", ""],
-        ["project-beta", "Alice Johnson"]
+        {"name": "project-alpha", "repo-name": "project-alpha", "authors": ""},
+        {"name": "Project Beta", "repo-name": "project-beta", "authors": "Alice Johnson"}
     ]
     assert result == expected, f"Expected {expected}, but got {result}"
     print("✓ Test 10 passed: Row with all empty author columns")
+
 
 def test_sanitize_repo_name():
     """Test the sanitize_repo_name function"""
