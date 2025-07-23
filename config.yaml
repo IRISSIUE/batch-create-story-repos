@@ -1,11 +1,23 @@
 github:
+  # "template" to the repository that will be copied from to create new repositories
   template_repo_owner: IRISSIUE
   template_repo_name: scrolly-story-generator
-  new_repo_owner: iris-stories
-  new_repo_name_prefix: codes2029
-  # The GitHub repo description will have the input project name appended to the prefix 
-  new_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
+
+  # "batch" refers to the repositories that will be created in bulk
+
+  batch_repo_owner: iris-stories
+  batch_repo_name_prefix: codes2029
+  # The GitHub repo description will have each input project name appended to the prefix 
+  batch_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
 
 google:
-  source_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
-  new_sheet_name: "Copy of Source Sheet"
+  # The Google Sheet that contains the input data for the batch creation
+  # The input data will have a project name and students (authors) assigned to each project, if any
+  input_data_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
+
+  # The Google Sheet with story data that will be copied for each batch story repo
+  template_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
+
+  # The prefix to prepend to the project name for each new Google Sheet created for each batch story repo
+  # E.g., each new sheet created will have a name like "Scrolly Story [Project Name]"
+  batch_sheet_name_prefix: "Scrolly Story "

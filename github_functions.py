@@ -28,9 +28,9 @@ def login_to_github():
 
     
 
-def create_repo_from_template(template_path, new_repo_owner, new_repo_name, new_repo_description):
+def create_repo_from_template(template_path, batch_repo_owner, batch_repo_name, batch_repo_description):
     
-    print(f"Attempting to create GitHub repo {new_repo_name} from template {template_path}...")
+    print(f"Attempting to create GitHub repo {batch_repo_name} from template {template_path}...")
 
     url = f"https://api.github.com/repos/{template_path}/generate"
 
@@ -39,9 +39,9 @@ def create_repo_from_template(template_path, new_repo_owner, new_repo_name, new_
     }
 
     data = {
-        "owner": new_repo_owner,
-        "name": new_repo_name,
-        "description": new_repo_description,
+        "owner": batch_repo_owner,
+        "name": batch_repo_name,
+        "description": batch_repo_description,
         "private": False
     }
     response = requests.post(url, headers=headers, json=data)
@@ -53,6 +53,6 @@ def create_repo_from_template(template_path, new_repo_owner, new_repo_name, new_
         print(response.json())
         return None
 
-    new_repo = GH.get_repo(f"{new_repo_owner}/{new_repo_name}")
+    new_repo = GH.get_repo(f"{batch_repo_owner}/{batch_repo_name}")
     return new_repo
 
