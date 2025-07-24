@@ -1,5 +1,5 @@
 github:
-  # "template" to the repository that will be copied from to create new repositories
+  # "template" is the repository that will be copied from in order to create new repositories
   template_repo_owner: IRISSIUE
   template_repo_name: scrolly-story-generator
 
@@ -12,12 +12,19 @@ github:
 
 google:
   # The Google Sheet that contains the input data for the batch creation
-  # The input data will have a project name and students (authors) assigned to each project, if any
+  # The input data will have a project name and students (authors) assigned to each repo to create
+  # Students/Authors are optional, and not needed to create repos, but will be added to the story data if provided
+  # The format of the data sheet is the first row is headers, and all subsequent rows are data.
+  # The first column is the project name and all subsequent columns are the students/authors for that project
   input_data_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
 
   # The Google Sheet with story data that will be copied for each batch story repo
   template_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
 
   # The prefix to prepend to the project name for each new Google Sheet created for each batch story repo
-  # E.g., each new sheet created will have a name like "Scrolly Story [Project Name]"
+  # E.g., each new story data sheet created will have a name like "Scrolly Story [Project Name]"
   batch_sheet_name_prefix: "Scrolly Story "
+
+  # The folder ID in Google Drive where the new story data sheets will be created
+  # if not provided, the new sheets will be created in the root of the user's Google Drive
+  batch_sheet_folder_id: "XXXX"
