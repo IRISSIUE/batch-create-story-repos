@@ -1,6 +1,7 @@
 import yaml
 
 from google_functions import fetch_repo_data_from_google_sheet
+from google_functions import copy_story_data_sheet_to_new_sheet
 from github_functions import login_to_github
 from github_functions import create_repo_from_template
 
@@ -21,8 +22,9 @@ BATCH_REPO_DESCRIPTION_PREFIX = gh_config["batch_repo_description_prefix"]
 # Google config
 g_config = config["google"]
 INPUT_DATA_SHEET_ID = g_config["input_data_sheet_id"]
+TEMPLATE_SHEET_ID = g_config["template_sheet_id"]
 BATCH_SHEET_NAME_PREFIX = g_config["batch_sheet_name_prefix"]
-
+BATCH_SHEET_FOLDER_ID = g_config.get("batch_sheet_folder_id", None)
 
 login_to_github()
 
@@ -38,11 +40,20 @@ for repo in repo_data:
         batch_repo_description=f"{BATCH_REPO_DESCRIPTION_PREFIX} {repo['name']}")
     if not new_repo:
         print(f"Failed to create repository for {repo['name']}. Skipping...")
-        continue
+        #continue  #TODO: catch 422 error for repo already exists and continue to the google sheet creation in that case, but continue for all other errors
+
+    print("Creating Google data sheets for the repository...")
+    story_data_sheet_id = copy_story_data_sheet_to_new_sheet(
+        template_sheet_id=TEMPLATE_SHEET_ID,
+        batch_sheet_name=f"{BATCH_SHEET_NAME_PREFIX}{repo['name']}",
+        batch_sheet_folder_id=BATCH_SHEET_FOLDER_ID
+    )
+
+    print(f"Created Google Sheet: {story_data_sheet_id}")
 
 
 
-exit(0)  # Exit after reading repo names
+exit(0)
 
 
 

@@ -7,11 +7,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 GOOGLE_CREDS = None
+SHEETS_SERVICE = None
+DRIVE_SERVICE = None
 
 def authenticate_google_user():
     """Authenticate using OAuth2 user credentials"""
     global GOOGLE_CREDS
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly', 
+              'https://www.googleapis.com/auth/drive']
     creds = None
     
     print("Authenticating Google user...")
@@ -46,6 +49,25 @@ def authenticate_google_user():
             token.write(creds.to_json())
     print(f"Google user authenticated successfully")
     GOOGLE_CREDS = creds
+
+def ensure_google_setup():
+    """Set up Google Sheets and Drive services using the authenticated credentials."""
+    global SHEETS_SERVICE, DRIVE_SERVICE
+    if GOOGLE_CREDS is None:
+        authenticate_google_user()
+
+    if GOOGLE_CREDS is None:
+        print("Error: Cannot set up Google services: Failed to authenticate with Google")
+        exit(1)
+
+    try:
+        if SHEETS_SERVICE is None:
+            SHEETS_SERVICE = build("sheets", "v4", credentials=GOOGLE_CREDS)
+        if DRIVE_SERVICE is None:
+            DRIVE_SERVICE = build("drive", "v3", credentials=GOOGLE_CREDS)
+    except Exception as e:
+        print(f"Error setting up Google services: {e}")
+        exit(1)
 
 def sanitize_repo_name(repo_name):
     """
@@ -113,23 +135,16 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values):
 
 def fetch_repo_data_from_google_sheet(google_sheet_id):
     print("Reading repository names from Google Sheet...")
-
-    if GOOGLE_CREDS is None:
-        authenticate_google_user()
-
-    if GOOGLE_CREDS is None:
-        print("Error: Cannot read repo names: Failed to authenticate with Google")
-        exit(1)
+    ensure_google_setup()
 
     try:
-        sheets_service = build("sheets", "v4", credentials=GOOGLE_CREDS)
 
         # Get the first sheet's name, as it is required to get the values for the sheet
-        sheet_metadata = sheets_service.spreadsheets().get(spreadsheetId=google_sheet_id).execute()
+        sheet_metadata = SHEETS_SERVICE.spreadsheets().get(spreadsheetId=google_sheet_id).execute()
         first_sheet_name = sheet_metadata['sheets'][0]['properties']['title']
 
         # Get all the values from the first sheet
-        sheet1_values = sheets_service.spreadsheets().values().get(
+        sheet1_values = SHEETS_SERVICE.spreadsheets().values().get(
             spreadsheetId=google_sheet_id,
             range=first_sheet_name
         ).execute()
@@ -145,3 +160,50 @@ def fetch_repo_data_from_google_sheet(google_sheet_id):
     
     # skip the header row and convert the rest
     return convert_sheet_values_to_repo_names_and_authors(sheet1_values[1:])
+
+def get_google_file(folder_id, file_name):
+    """Check if a file with the given name exists in the specified Google Drive folder."""
+    ensure_google_setup()
+
+    try:
+        query = f"name='{file_name}' and trashed=false"
+        if folder_id:
+            query += f" and '{folder_id}' in parents"
+
+        results = DRIVE_SERVICE.files().list(q=query, pageSize=1).execute()
+        items = results.get('files', [])
+        if items:
+            return items[0]['id']
+        else:
+            return None  # File not found
+    except Exception as e:
+        print(f"Error checking file existence: {e}")
+        return None
+
+def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batch_sheet_folder_id=None):
+    """Copy the source Google Sheet to a new sheet with the specified name."""
+    ensure_google_setup()
+
+    new_sheet_id = get_google_file(batch_sheet_folder_id, batch_sheet_name)
+    if new_sheet_id:
+        print(f"Sheet with name '{batch_sheet_name}' already exists in the specified folder. Skipping copy.")
+        return new_sheet_id
+
+    try:
+        copy_body_params = {"name": batch_sheet_name}
+        if batch_sheet_folder_id:
+            copy_body_params["parents"] = [batch_sheet_folder_id]
+
+        copied_sheet = DRIVE_SERVICE.files().copy(
+            fileId=template_sheet_id,
+            body=copy_body_params
+        ).execute()
+        
+        new_sheet_id = copied_sheet["id"]
+        print(f"New Google Sheet created: https://docs.google.com/spreadsheets/d/{new_sheet_id}")
+        return new_sheet_id
+    except Exception as e:
+        print(f"Error copying Google Sheet: {e}")
+        return None
+
+        

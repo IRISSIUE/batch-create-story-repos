@@ -16,10 +16,12 @@ google:
   # Students/Authors are optional, and not needed to create repos, but will be added to the story data if provided
   # The format of the data sheet is the first row is headers, and all subsequent rows are data.
   # The first column is the project name and all subsequent columns are the students/authors for that project
+  # ID is in the Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
   input_data_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
 
   # The Google Sheet with story data that will be copied for each batch story repo
-  template_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
+  # ID is in the Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
+  template_sheet_id: "17sHlHcOilG9UmRju8YDGx4bRMIDpQ5Bpfzc0QI-Np6c"
 
   # The prefix to prepend to the project name for each new Google Sheet created for each batch story repo
   # E.g., each new story data sheet created will have a name like "Scrolly Story [Project Name]"
@@ -27,4 +29,5 @@ google:
 
   # The folder ID in Google Drive where the new story data sheets will be created
   # if not provided, the new sheets will be created in the root of the user's Google Drive
-  batch_sheet_folder_id: "XXXX"
+  # ID is in the folder URL: https://drive.google.com/drive/u/3/folders/XXXXXXX
+  batch_sheet_folder_id: "1dKgWFk5NrGg6oZwAOpaHQSeKB3icvIsg"
