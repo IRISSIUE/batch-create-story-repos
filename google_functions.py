@@ -6,9 +6,16 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+
 GOOGLE_CREDS = None
 SHEETS_SERVICE = None
 DRIVE_SERVICE = None
+VERBOSE = False
+
+def set_verbose(verbose):
+    """Set the global verbose flag"""
+    global VERBOSE
+    VERBOSE = verbose
 
 def authenticate_google_user():
     """Authenticate using OAuth2 user credentials"""
@@ -17,19 +24,23 @@ def authenticate_google_user():
               'https://www.googleapis.com/auth/drive']
     creds = None
     
-    print("Authenticating Google user...")
+    if VERBOSE:
+        print("Authenticating Google user...")
     # Token file stores the user's access and refresh tokens
     if os.path.exists('.auth/token.json'):
-        print("Loading existing credentials from .auth/token.json...")
+        if VERBOSE:
+            print("Loading existing credentials from .auth/token.json...")
         creds = Credentials.from_authorized_user_file('.auth/token.json', SCOPES)
     
     # If there are no (valid) credentials available, let the user log in
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            print("Refreshing expired credentials...")
+            if VERBOSE:
+                print("Refreshing expired credentials...")
             creds.refresh(Request())
         else:
-            print("No valid credentials found. Opening browser for authentication...")
+            if VERBOSE:
+                print("No valid credentials found. Opening browser for authentication...")
             try:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     '.auth/credentials.json', SCOPES)  # These are the OAuth2 client secrets
@@ -47,7 +58,8 @@ def authenticate_google_user():
         with open('.auth/token.json', 'w') as token:
             print("Saving new credentials to .auth/token.json...")
             token.write(creds.to_json())
-    print(f"Google user authenticated successfully")
+    if VERBOSE:
+        print(f"Google user authenticated successfully")
     GOOGLE_CREDS = creds
 
 def ensure_google_setup():
@@ -134,7 +146,8 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values):
     return converted_data
 
 def fetch_repo_data_from_google_sheet(google_sheet_id):
-    print("Reading repository names from Google Sheet...")
+    if VERBOSE:
+        print("Reading repository names from Google Sheet...")
     ensure_google_setup()
 
     try:
@@ -170,10 +183,10 @@ def get_google_file(folder_id, file_name):
         if folder_id:
             query += f" and '{folder_id}' in parents"
 
-        results = DRIVE_SERVICE.files().list(q=query, pageSize=1).execute()
+        results = DRIVE_SERVICE.files().list(q=query, pageSize=1, fields='files(id,name, webViewLink)').execute()
         items = results.get('files', [])
         if items:
-            return items[0]['id']
+            return items[0]['webViewLink']
         else:
             return None  # File not found
     except Exception as e:
@@ -184,10 +197,9 @@ def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batc
     """Copy the source Google Sheet to a new sheet with the specified name."""
     ensure_google_setup()
 
-    new_sheet_id = get_google_file(batch_sheet_folder_id, batch_sheet_name)
-    if new_sheet_id:
-        print(f"Sheet with name '{batch_sheet_name}' already exists in the specified folder. Skipping copy.")
-        return new_sheet_id
+    new_sheet_URL = get_google_file(batch_sheet_folder_id, batch_sheet_name)
+    if new_sheet_URL:
+        return "existed", new_sheet_URL
 
     try:
         copy_body_params = {"name": batch_sheet_name}
@@ -199,11 +211,9 @@ def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batc
             body=copy_body_params
         ).execute()
         
-        new_sheet_id = copied_sheet["id"]
-        print(f"New Google Sheet created: https://docs.google.com/spreadsheets/d/{new_sheet_id}")
-        return new_sheet_id
+        new_sheet_URL = copied_sheet["webViewLink"]
+        return "created", new_sheet_URL
     except Exception as e:
-        print(f"Error copying Google Sheet: {e}")
-        return None
+        return "error", e
 
         

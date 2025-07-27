@@ -10,9 +10,14 @@ github:
   # The GitHub repo description will have each input project name appended to the prefix 
   batch_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
 
+  # After the repository and story data sheet are created, the repo needs to know where to look for the story data sheet
+  # These  are used to edit the right repo file and variable with the new story sheet ID
+  batch_file_name_to_edit_with_new_story_sheet_id: "google-sheet-config.js"
+  batch_file_variable_to_edit_with_new_data_sheet_id: "googleSheetURL"
+
 google:
   # The Google Sheet that contains the input data for the batch creation
-  # The input data will have a project name and students (authors) assigned to each repo to create
+  # The input data file will have a project name and students (authors) assigned to each repo to be created
   # Students/Authors are optional, and not needed to create repos, but will be added to the story data if provided
   # The format of the data sheet is the first row is headers, and all subsequent rows are data.
   # The first column is the project name and all subsequent columns are the students/authors for that project
@@ -31,3 +36,8 @@ google:
   # if not provided, the new sheets will be created in the root of the user's Google Drive
   # ID is in the folder URL: https://drive.google.com/drive/u/3/folders/XXXXXXX
   batch_sheet_folder_id: "1dKgWFk5NrGg6oZwAOpaHQSeKB3icvIsg"
+
+
+
+
+
