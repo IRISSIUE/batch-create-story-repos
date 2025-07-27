@@ -1,6 +1,7 @@
 .auth 
 credentials.json
 token.json
+env.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
