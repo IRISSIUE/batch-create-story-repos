@@ -138,7 +138,7 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values):
             student_names = convert_author_names_to_list(row[1:]) # Subsequent columns are one column per author
     
             repo_data = {
-                "name": original_name,
+                "title": original_name,
                 "repo-name": repo_name,
                 "authors": student_names
             }

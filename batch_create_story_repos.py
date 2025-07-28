@@ -31,22 +31,21 @@ BATCH_SHEET_FOLDER_ID = g_config.get("batch_sheet_folder_id", None)
 
 login_to_github()
 
-#TODO: Rename repo['name'] to repo['title'] in the Google Sheet
 all_repo_data = fetch_repo_data_from_google_sheet(INPUT_DATA_SHEET_ID)
 print(f"Fetched {len(all_repo_data)} repository names from Google Sheet.")
 print(all_repo_data)
 
 for repo_data in all_repo_data:
 
-    print(f"Processing repository: {repo_data['name']}...")
+    print(f"Processing repository: {repo_data['title']}...")
     
     result, new_repo = create_repo_from_template(
         template_path=f"{TEMPLATE_REPO_OWNER}/{TEMPLATE_REPO_NAME}",
         batch_repo_owner=BATCH_REPO_OWNER,
         batch_repo_name=f"{BATCH_REPO_NAME_PREFIX}-{repo_data['repo-name']}",    
-        batch_repo_description=f"{BATCH_REPO_DESCRIPTION_PREFIX} {repo_data['name']}")
+        batch_repo_description=f"{BATCH_REPO_DESCRIPTION_PREFIX} {repo_data['title']}")
     if result == "error":
-        print(f"     ❌ Failed to create repository for {repo_data['name']}. Skipping...")
+        print(f"     ❌ Failed to create repository for {repo_data['title']}. Skipping...")
         continue
     elif result == "existed":
         print(f"     ✓ GitHub Repository already existed: {new_repo.archive_url}")
@@ -56,7 +55,7 @@ for repo_data in all_repo_data:
 
     result, story_data_sheet_URL = copy_story_data_sheet_to_new_sheet(
         template_sheet_id=TEMPLATE_SHEET_ID,
-        batch_sheet_name=f"{BATCH_SHEET_NAME_PREFIX}{repo_data['name']}",
+        batch_sheet_name=f"{BATCH_SHEET_NAME_PREFIX}{repo_data['title']}",
         batch_sheet_folder_id=BATCH_SHEET_FOLDER_ID
     )
     if result == "error":
@@ -79,7 +78,7 @@ for repo_data in all_repo_data:
         print(f"     ❌ Failed to edit {BATCH_FILE_NAME_TO_EDIT}")
         print(f"     Error: {e}")
     elif result == "no changes":
-        print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} in {BATCH_FILE_NAME_TO_EDIT}. Variable not found?")
+        print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.  Skipping update.")
     elif result == "updated":
         print(f"     ✓ Successfully updated {BATCH_FILE_NAME_TO_EDIT} with new Google Sheet URL.")
 

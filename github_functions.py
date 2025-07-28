@@ -17,7 +17,7 @@ def login_to_github():
         print("A Github Personal Access Token is required to access the existing template repository" \
             " and to create the new repositories.")
         print("The Github account associated with the token must have access to " \
-                " both the template repository and the organization where you will create the new repositories.")
+                " both the template repository and the organization where you will create the new repositories (template_repo_name and batch_repo_owner in config.yaml).")
         print("You can set the token in your enviornment by invoking the commands:")
         print("Unix/Linux/macOS: 'export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXX'")
         print("Windows: 'set GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXX' or '$env:GITHUB_TOKEN=""ghp_XXXXXXXXXXXXXXXXXX""' ")
