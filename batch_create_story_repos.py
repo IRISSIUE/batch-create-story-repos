@@ -5,6 +5,7 @@ from google_functions import copy_story_data_sheet_to_new_sheet
 from github_functions import login_to_github
 from github_functions import create_repo_from_template
 from github_functions import update_repo_with_google_data_sheet_link
+from github_functions import enable_github_page
 
 
 # --- Load config from YAML ---
@@ -47,7 +48,7 @@ for repo_data in all_repo_data:
     if result == "error":
         print(f"     ❌ Failed to create repository for {repo_data['title']}. Skipping...")
         continue
-    elif result == "existed":
+    elif result == "exists":
         print(f"     ✓ GitHub Repository already exists: {new_repo.html_url}")
     elif result == "created":
         print(f"     ✓ GitHub Repository created: {new_repo.archive_url}")
@@ -63,7 +64,7 @@ for repo_data in all_repo_data:
         print(f"     Error: {story_data_sheet_URL}")
         print(f"     Skipping...")
         continue
-    elif result == "existed":
+    elif result == "exists":
         print(f"     ✓ Google Data Sheet already exists: {story_data_sheet_URL}")
     elif result == "created":
         print(f"     ✓ Google Data Sheet created: {story_data_sheet_URL}")
@@ -81,6 +82,16 @@ for repo_data in all_repo_data:
         print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} var in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.")
     elif result == "updated":
         print(f"     ✓ Successfully updated {BATCH_FILE_NAME_TO_EDIT} with new Google Sheet URL.")
+
+
+    result, page = enable_github_page(new_repo)
+    if result == "error":
+        print(f"     ❌ Failed to create github page for {new_repo.full_name}")
+        print(f"     Error: {page}")
+    elif result == "exists":
+        print(f"     ✓ GitHub page already enabled: {page['html_url']}")
+    elif result == "created":
+        print(f"     ✓ Successfully enabled Github page: {page['html_url']}")
 
 
 

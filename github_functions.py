@@ -42,9 +42,9 @@ def create_repo_from_template(template_path, batch_repo_owner, batch_repo_name, 
     rep_path = f"{batch_repo_owner}/{batch_repo_name}"
 
     # Check if the repository already exists
-    new_repo = GH.get_repo(rep_path)
+    new_repo = get_repository_from_gitHub(rep_path)
     if new_repo:
-        return ("existed", new_repo)
+        return ("exists", new_repo)
 
     url = f"https://api.github.com/repos/{template_path}/generate"
 
@@ -120,4 +120,48 @@ def update_variable_with_data_sheet_link(lines, story_data_sheet_URL, variable_t
             updated_lines.append(line)
 
     return updated_lines if variable_found else lines
+
+def enable_github_page(repo):
+    """Enable GitHub Pages for the repository."""
+
+    try:
+        page = get_repo_page(repo)
+        if page:
+            return "exists", page
+    
+        url = f"https://api.github.com/repos/{repo.full_name}/pages"
+        headers = {
+            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        data = {
+            "source": {
+                "branch": "main",
+                "path": "/"
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=data)
+        
+        if response.status_code == 201:
+            return "created", response.json()
+        else:
+            return "error", f"Failed to enable Pages: {response.status_code} - {response.text}"
+            
+    except Exception as e:
+        return "error", f"Failed to enable GitHub Pages: {str(e)}"
+    
+def get_repo_page(repo):
+    url = f"https://api.github.com/repos/{repo.full_name}/pages"
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else :
+        return None
 

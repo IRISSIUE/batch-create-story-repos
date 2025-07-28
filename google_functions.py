@@ -199,7 +199,7 @@ def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batc
 
     new_sheet_URL = get_google_file(batch_sheet_folder_id, batch_sheet_name)
     if new_sheet_URL:
-        return "existed", new_sheet_URL
+        return "exists", new_sheet_URL
 
     try:
         copy_body_params = {"name": batch_sheet_name}
