@@ -48,7 +48,7 @@ for repo_data in all_repo_data:
         print(f"     ❌ Failed to create repository for {repo_data['title']}. Skipping...")
         continue
     elif result == "existed":
-        print(f"     ✓ GitHub Repository already existed: {new_repo.archive_url}")
+        print(f"     ✓ GitHub Repository already exists: {new_repo.html_url}")
     elif result == "created":
         print(f"     ✓ GitHub Repository created: {new_repo.archive_url}")
 
@@ -64,9 +64,9 @@ for repo_data in all_repo_data:
         print(f"     Skipping...")
         continue
     elif result == "existed":
-        print(f"     ✓ Google Data Sheet already existed: {story_data_sheet_URL}")
+        print(f"     ✓ Google Data Sheet already exists: {story_data_sheet_URL}")
     elif result == "created":
-        print(f"     ✓ Google Data Sheet already existed: {story_data_sheet_URL}")
+        print(f"     ✓ Google Data Sheet created: {story_data_sheet_URL}")
 
     result, e = update_repo_with_google_data_sheet_link(
             repo=new_repo,
@@ -78,7 +78,7 @@ for repo_data in all_repo_data:
         print(f"     ❌ Failed to edit {BATCH_FILE_NAME_TO_EDIT}")
         print(f"     Error: {e}")
     elif result == "no changes":
-        print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.  Skipping update.")
+        print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} var in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.")
     elif result == "updated":
         print(f"     ✓ Successfully updated {BATCH_FILE_NAME_TO_EDIT} with new Google Sheet URL.")
 
