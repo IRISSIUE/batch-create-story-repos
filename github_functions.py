@@ -37,14 +37,21 @@ def get_repository_from_gitHub(repo_path):
         return None
     return repo
 
-def create_repo_from_template(template_path, batch_repo_owner, batch_repo_name, batch_repo_description):
+def create_repo_from_template(template_path, batch_repo_owner, batch_repo_name, batch_repo_description) -> tuple:
+    """Create a new repository from a template repository.
+    
+    Returns a tuple of (result, new_repo, error_message).
+        result can be "created", "exists", or "error" 
+        new_repo is the created repository object or None if an error occurred.
+        error_message is the error message if an error occurred, otherwise None.
+    """
     
     rep_path = f"{batch_repo_owner}/{batch_repo_name}"
 
     # Check if the repository already exists
     new_repo = get_repository_from_gitHub(rep_path)
     if new_repo:
-        return ("exists", new_repo)
+        return ("exists", new_repo, None)
 
     url = f"https://api.github.com/repos/{template_path}/generate"
 
@@ -61,13 +68,18 @@ def create_repo_from_template(template_path, batch_repo_owner, batch_repo_name, 
     response = requests.post(url, headers=headers, json=data)
 
     if response.status_code != 201:
-        return ("error", response.json())
+        return ("error", None, response.json())
 
     new_repo = GH.get_repo(f"{batch_repo_owner}/{batch_repo_name}")
-    return ("created", new_repo)
+    return ("created", new_repo, None)
 
-def update_repo_with_google_data_sheet_link(repo, story_data_sheet_URL, file_to_update, variable_to_update):
-    """Update the file in the repository that contains the link to the data sheet."""
+def update_repo_with_google_data_sheet_link(repo, story_data_sheet_URL, file_to_update, variable_to_update) -> tuple:
+    """Update the file in the repository that contains the link to the data sheet.
+    
+    Returns a tuple of (result, updated_file, error_message).
+        result can be "updated", "no changes", or "error".
+        error_message is the error message if an error occurred, otherwise None.
+    """
 
     try:
         file = repo.get_contents(file_to_update, ref=repo.default_branch)
@@ -94,12 +106,16 @@ def update_repo_with_google_data_sheet_link(repo, story_data_sheet_URL, file_to_
             branch="main"
         )
     except Exception as e:
-        return "error", f"Failed to update file {file_to_update}: {str(e)}"
+        return "error", e
     
     return "updated", result
 
-def update_variable_with_data_sheet_link(lines, story_data_sheet_URL, variable_to_update):
-    """Update the specified variable in the lines with the new data sheet link."""
+def update_variable_with_data_sheet_link(lines, story_data_sheet_URL, variable_to_update) -> list:
+    """Update the specified variable in the lines with the new data sheet link.
+    
+    Returns the updated lines if the variable was found and updated, otherwise returns the original lines.
+
+    """
     
     updated_lines = []
     variable_found = False
@@ -121,13 +137,19 @@ def update_variable_with_data_sheet_link(lines, story_data_sheet_URL, variable_t
 
     return updated_lines if variable_found else lines
 
-def enable_github_page(repo):
-    """Enable GitHub Pages for the repository."""
+def enable_github_page(repo) -> tuple:
+    """Enable GitHub Pages for the repository.
+    
+    Returns a tuple of (result, page, error_message).
+        result can be "created", "exists", or "error".  
+        page is the page object if the page was created or already exists, otherwise None.
+        error_message is the error message if an error occurred, otherwise None.
+    """
 
     try:
         page = get_repo_page(repo)
         if page:
-            return "exists", page
+            return "exists", page, None
     
         url = f"https://api.github.com/repos/{repo.full_name}/pages"
         headers = {
@@ -144,12 +166,12 @@ def enable_github_page(repo):
         response = requests.post(url, headers=headers, json=data)
         
         if response.status_code == 201:
-            return "created", response.json()
+            return "created", response.json(), None
         else:
-            return "error", f"Failed to enable Pages: {response.status_code} - {response.text}"
+            return "error", None, f"Failed to enable Pages: {response.status_code} - {response.text}"
             
     except Exception as e:
-        return "error", f"Failed to enable GitHub Pages: {str(e)}"
+        return "error", None, e
     
 def get_repo_page(repo):
     url = f"https://api.github.com/repos/{repo.full_name}/pages"

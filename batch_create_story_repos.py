@@ -43,13 +43,15 @@ for repo_data in all_repo_data:
 
     print(f"Processing repository: {repo_data['title']}...")
     
-    result, new_repo = create_repo_from_template(
+    result, new_repo, e = create_repo_from_template(
         template_path=f"{TEMPLATE_REPO_OWNER}/{TEMPLATE_REPO_NAME}",
         batch_repo_owner=BATCH_REPO_OWNER,
         batch_repo_name=f"{BATCH_REPO_NAME_PREFIX}-{repo_data['repo-name']}",    
         batch_repo_description=f"{BATCH_REPO_DESCRIPTION_PREFIX} {repo_data['title']}")
     if result == "error":
-        print(f"     ❌ Failed to create repository for {repo_data['title']}. Skipping...")
+        print(f"     ❌ Failed to create GitHub repository for {repo_data['title']}")
+        print(f"     Error: {str(e)}")
+        print("      Skipping...   ")
         continue
     elif result == "exists":
         print(f"     ✓ GitHub Repository already exists: {new_repo.html_url}")
@@ -57,14 +59,14 @@ for repo_data in all_repo_data:
         print(f"     ✓ GitHub Repository created: {new_repo.archive_url}")
 
 
-    result, story_data_sheet_id, story_data_sheet_URL = copy_story_data_sheet_to_new_sheet(
+    result, story_data_sheet_id, story_data_sheet_URL, e = copy_story_data_sheet_to_new_sheet(
         template_sheet_id=TEMPLATE_SHEET_ID,
         batch_sheet_name=f"{BATCH_SHEET_NAME_PREFIX}{repo_data['title']}",
         batch_sheet_folder_id=BATCH_SHEET_FOLDER_ID
     )
     if result == "error":
         print(f"     ❌ Failed to create Google data sheet")
-        print(f"     Error: {story_data_sheet_URL}")
+        print(f"     Error: {str(e)}")
         print(f"     Skipping...")
         continue
     elif result == "exists":
@@ -75,20 +77,20 @@ for repo_data in all_repo_data:
 
     result, e = share_sheet_with_anyone(story_data_sheet_id)
     if result == "error":
-        print(f"     ❌ Failed to publish sheet to web")
-        print(f"     Error: {e}")
+        print(f"     ❌ Failed to share data sheet to anyone with link")
+        print(f"     Error: {str(e)}")
     elif result == "already_shared":
-        print(f"     ✓ Already shared with anyone with link: {story_data_sheet_URL}")
+        print(f"     ✓ Google Data sheet already shared with anyone with link")
     elif result == "updated":
-        print(f"     ✓ Shared with anyone with link: {story_data_sheet_URL}")
+        print(f"     ✓ Google Data sheet shared with anyone with link")
 
 
     result, e = edit_sheet_with_project_info(story_data_sheet_id, repo_data['title'], repo_data['authors'])
     if result == "error":
-        print(f"     ❌ Failed to edit {story_data_sheet_URL} with story title and authors")
-        print(f"     Error: {e}")
+        print(f"     ❌ Failed to update data sheet with story title and authors")
+        print(f"     Error: {str(e)}")
     elif result == "updated":
-        print(f"     ✓ Updated {story_data_sheet_URL} with story title and authors")
+        print(f"     ✓ Google Data Sheet updated with story title and authors")
 
 
     result, e = update_repo_with_google_data_sheet_link(
@@ -99,19 +101,19 @@ for repo_data in all_repo_data:
     )
     if result == "error":
         print(f"     ❌ Failed to edit {BATCH_FILE_NAME_TO_EDIT} in the repo to point it back to data sheet")
-        print(f"     Error: {e}")
+        print(f"     Error: {str(e)}")
     elif result == "no changes":
-        print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} var in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.")
+        print(f"     ✓ GitHub already updated to point to new Google Data Sheet URL for data. Either already up to date or no variable found.")
     elif result == "updated":
-        print(f"     ✓ Updated {BATCH_FILE_NAME_TO_EDIT} with new Data Google Sheet URL.")
+        print(f"     ✓ GitHub updated to point to new Google Data Sheet URL for data.")
 
 
-    result, page = enable_github_page(new_repo)
+    result, page, e = enable_github_page(new_repo)
     if result == "error":
         print(f"     ❌ Failed to enable GitHub Page for {new_repo.full_name}")
-        print(f"     Error: {page}")
+        print(f"     Error: {str(e)}")
     elif result == "exists":
-        print(f"     ✓ GitHub page already enabled: {page['html_url']}")
+        print(f"     ✓ GitHub Pages link already enabled: {page['html_url']}")
     elif result == "created":
         print(f"     ✓ Enabled Github Pages link: {page['html_url']}")
 

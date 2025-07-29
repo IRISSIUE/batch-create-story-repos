@@ -17,7 +17,7 @@ def set_verbose(verbose):
     global VERBOSE
     VERBOSE = verbose
 
-def authenticate_google_user():
+def authenticate_google_user() -> None:
     """Authenticate using OAuth2 user credentials"""
     global GOOGLE_CREDS
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 
@@ -62,7 +62,7 @@ def authenticate_google_user():
         print(f"Google user authenticated successfully")
     GOOGLE_CREDS = creds
 
-def ensure_google_setup():
+def ensure_google_setup() -> None:
     """Set up Google Sheets and Drive services using the authenticated credentials."""
     global SHEETS_SERVICE, DRIVE_SERVICE
     if GOOGLE_CREDS is None:
@@ -86,6 +86,8 @@ def sanitize_repo_name(repo_name):
     Convert repo name to contain only alphanumeric characters and dashes.
     Spaces (single or multiple) are converted to single dashes.
     Non-alphanumeric characters (except spaces) are removed.
+
+    returns: A sanitized version of the repo name suitable for GitHub.
     """
     if not repo_name:
         return ""
@@ -104,9 +106,11 @@ def sanitize_repo_name(repo_name):
     
     return cleaned
 
-def sanitize_author_name(author_name):
+def sanitize_author_name(author_name) -> str:
     """
     Sanitize author names by removing leading/trailing whitespace and converting to title case.
+
+    returns: A sanitized version of the author name.
     """
     if not author_name:
         return ""
@@ -117,8 +121,12 @@ def sanitize_author_name(author_name):
     author_name = re.sub(r'\s+', ' ', author_name)
     return author_name
 
-def convert_author_names_to_list(author_columns):
-    """Convert columns of author names into a string with commas separating each author."""
+def convert_author_names_to_list(author_columns) -> str:
+    """Convert columns of author names into a string with commas separating each author.
+    
+    returns: A string of author names separated by commas.
+    """
+
     author_names = [] 
     
     for column_value in author_columns: 
@@ -128,8 +136,11 @@ def convert_author_names_to_list(author_columns):
 
     return ", ".join(author_names)
 
-def convert_sheet_values_to_repo_names_and_authors(sheet_values):
-    """Convert Google Sheet values to a list of repository names."""
+def convert_sheet_values_to_repo_names_and_authors(sheet_values) -> list:
+    """Convert Google Sheet values to a list of repository names.
+    
+    Returns a list of dictionaries with 'title', 'repo-name', and 'authors' keys.
+    """
     converted_data = []
     for row in sheet_values:
         if row:  
@@ -145,7 +156,11 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values):
             converted_data.append(repo_data)
     return converted_data
 
-def fetch_repo_data_from_google_sheet(google_sheet_id):
+def fetch_repo_data_from_google_sheet(google_sheet_id) -> list:
+    """Fetch repository names and authors from the first sheet of a Google Sheet.
+
+    Returns a list of dictionaries with 'title', 'repo-name', and 'authors' keys.
+    """
     if VERBOSE:
         print("Reading repository names from Google Sheet...")
     ensure_google_setup()
@@ -174,8 +189,11 @@ def fetch_repo_data_from_google_sheet(google_sheet_id):
     # skip the header row and convert the rest
     return convert_sheet_values_to_repo_names_and_authors(sheet1_values[1:])
 
-def get_google_file(folder_id, file_name):
-    """Check if a file with the given name exists in the specified Google Drive folder."""
+def get_google_file(folder_id, file_name) -> tuple:
+    """Check if a file with the given name exists in the specified Google Drive folder.
+    
+    Returns a tuple of (file_id, file_url) if the file exists, otherwise (None, None).
+    """
     ensure_google_setup()
 
     try:
@@ -193,13 +211,20 @@ def get_google_file(folder_id, file_name):
         print(f"Error checking file existence: {e}")
         return None, None
 
-def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batch_sheet_folder_id=None):
-    """Copy the source Google Sheet to a new sheet with the specified name."""
+def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batch_sheet_folder_id=None) -> tuple:
+    """Copy the source Google Sheet to a new sheet with the specified name.
+    
+    Returns a tuple of (result, new_sheet_id, new_sheet_URL, error_message).
+        result can be "created", "exists", or "error"
+        new_sheet_id is the ID of the newly created sheet or None if an error occurred.
+        new_sheet_URL is the URL of the newly created sheet or None if an error occurred.
+        error_message is the error message if an error occurred, otherwise None.
+    """
     ensure_google_setup()
 
     new_sheet_id, new_sheet_URL = get_google_file(batch_sheet_folder_id, batch_sheet_name)
     if new_sheet_URL:
-        return "exists", new_sheet_id, new_sheet_URL
+        return "exists", new_sheet_id, new_sheet_URL, None
 
     try:
         copy_body_params = {"name": batch_sheet_name}
@@ -211,13 +236,18 @@ def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batc
             body=copy_body_params
         ).execute()
         
-        return "created", copied_sheet["id"], copied_sheet["webViewLink"]
+        return "created", copied_sheet["id"], copied_sheet["webViewLink"], None
     except Exception as e:
-        return "error", e
+        return "error", None, None, e
     
 
-def share_sheet_with_anyone(sheet_id):
-    """Share sheet to anyone with the link."""
+def share_sheet_with_anyone(sheet_id) -> tuple:
+    """Share sheet to anyone with the link.
+    
+    Returns a tuple of (result, error_message).
+        result can be "shared", "already_shared", or "error".
+        error_message is the error message if an error occurred, otherwise None.
+    """
     ensure_google_setup()
 
     try:
@@ -249,7 +279,12 @@ def is_sheet_already_shared(sheet_id):
             return True
     return False
 
-def edit_sheet_with_project_info(sheet_id, project_name, authors):
+def edit_sheet_with_project_info(sheet_id, project_name, authors) -> tuple:
+    """Edit the Google Sheet with the project name and authors.
+    Returns a tuple of (result, error_message).
+        result can be "updated" or "error"
+        error_message is the error message if an error occurred, otherwise None.
+    """
 
     ensure_google_setup()
 
@@ -276,7 +311,7 @@ def edit_sheet_with_project_info(sheet_id, project_name, authors):
 
         # The update function returns a dict with info on what was updated but
         # we only care unless there's an error, which is caught in the try-except block
-        return "updated", f"Updated title and authors in sheet"
+        return "updated", None
         
     except Exception as e:
         return "error", e
