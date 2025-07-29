@@ -249,3 +249,35 @@ def is_sheet_already_shared(sheet_id):
             return True
     return False
 
+def edit_sheet_with_project_info(sheet_id, project_name, authors):
+
+    ensure_google_setup()
+
+    try:
+        # Update the Scrolly Story Title cell
+        SHEETS_SERVICE.spreadsheets().values().update(
+            spreadsheetId=sheet_id,
+            range="Story!B2",  # The Title of the Scrolly Story
+            valueInputOption="RAW", 
+            body={
+                "values": [[project_name]] 
+            }
+        ).execute()
+        
+        # Update the Scrolly Story Authors cell
+        SHEETS_SERVICE.spreadsheets().values().update(
+            spreadsheetId=sheet_id,
+            range="Story!D2",  # The Authors field
+            valueInputOption="RAW",
+            body={
+                "values": [[authors]]
+            }
+        ).execute()
+
+        # The update function returns a dict with info on what was updated but
+        # we only care unless there's an error, which is caught in the try-except block
+        return "updated", f"Updated title and authors in sheet"
+        
+    except Exception as e:
+        return "error", e
+    

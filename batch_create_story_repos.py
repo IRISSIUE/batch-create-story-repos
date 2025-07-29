@@ -3,6 +3,7 @@ import yaml
 from google_functions import fetch_repo_data_from_google_sheet
 from google_functions import copy_story_data_sheet_to_new_sheet
 from google_functions import share_sheet_with_anyone
+from google_functions import edit_sheet_with_project_info
 
 from github_functions import login_to_github
 from github_functions import create_repo_from_template
@@ -81,6 +82,15 @@ for repo_data in all_repo_data:
     elif result == "updated":
         print(f"     ✓ Shared with anyone with link: {story_data_sheet_URL}")
 
+
+    result, e = edit_sheet_with_project_info(story_data_sheet_id, repo_data['title'], repo_data['authors'])
+    if result == "error":
+        print(f"     ❌ Failed to edit {story_data_sheet_URL} with story title and authors")
+        print(f"     Error: {e}")
+    elif result == "updated":
+        print(f"     ✓ Updated {story_data_sheet_URL} with story title and authors")
+
+
     result, e = update_repo_with_google_data_sheet_link(
             repo=new_repo,
             story_data_sheet_URL=story_data_sheet_URL,
@@ -88,17 +98,17 @@ for repo_data in all_repo_data:
             variable_to_update=BATCH_FILE_VARIABLE_TO_EDIT
     )
     if result == "error":
-        print(f"     ❌ Failed to edit {BATCH_FILE_NAME_TO_EDIT}")
+        print(f"     ❌ Failed to edit {BATCH_FILE_NAME_TO_EDIT} in the repo to point it back to data sheet")
         print(f"     Error: {e}")
     elif result == "no changes":
         print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} var in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.")
     elif result == "updated":
-        print(f"     ✓ Updated {BATCH_FILE_NAME_TO_EDIT} with new Google Sheet URL.")
+        print(f"     ✓ Updated {BATCH_FILE_NAME_TO_EDIT} with new Data Google Sheet URL.")
 
 
     result, page = enable_github_page(new_repo)
     if result == "error":
-        print(f"     ❌ Failed to create github page for {new_repo.full_name}")
+        print(f"     ❌ Failed to enable GitHub Page for {new_repo.full_name}")
         print(f"     Error: {page}")
     elif result == "exists":
         print(f"     ✓ GitHub page already enabled: {page['html_url']}")
