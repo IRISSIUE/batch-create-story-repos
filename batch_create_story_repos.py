@@ -2,6 +2,8 @@ import yaml
 
 from google_functions import fetch_repo_data_from_google_sheet
 from google_functions import copy_story_data_sheet_to_new_sheet
+from google_functions import share_sheet_with_anyone
+
 from github_functions import login_to_github
 from github_functions import create_repo_from_template
 from github_functions import update_repo_with_google_data_sheet_link
@@ -54,7 +56,7 @@ for repo_data in all_repo_data:
         print(f"     ✓ GitHub Repository created: {new_repo.archive_url}")
 
 
-    result, story_data_sheet_URL = copy_story_data_sheet_to_new_sheet(
+    result, story_data_sheet_id, story_data_sheet_URL = copy_story_data_sheet_to_new_sheet(
         template_sheet_id=TEMPLATE_SHEET_ID,
         batch_sheet_name=f"{BATCH_SHEET_NAME_PREFIX}{repo_data['title']}",
         batch_sheet_folder_id=BATCH_SHEET_FOLDER_ID
@@ -69,6 +71,16 @@ for repo_data in all_repo_data:
     elif result == "created":
         print(f"     ✓ Google Data Sheet created: {story_data_sheet_URL}")
 
+
+    result, e = share_sheet_with_anyone(story_data_sheet_id)
+    if result == "error":
+        print(f"     ❌ Failed to publish sheet to web")
+        print(f"     Error: {e}")
+    elif result == "already_shared":
+        print(f"     ✓ Already shared with anyone with link: {story_data_sheet_URL}")
+    elif result == "updated":
+        print(f"     ✓ Shared with anyone with link: {story_data_sheet_URL}")
+
     result, e = update_repo_with_google_data_sheet_link(
             repo=new_repo,
             story_data_sheet_URL=story_data_sheet_URL,
@@ -81,7 +93,7 @@ for repo_data in all_repo_data:
     elif result == "no changes":
         print(f"     ✓ No changes made to {BATCH_FILE_VARIABLE_TO_EDIT} var in {BATCH_FILE_NAME_TO_EDIT}. Either already up to date or no variable found.")
     elif result == "updated":
-        print(f"     ✓ Successfully updated {BATCH_FILE_NAME_TO_EDIT} with new Google Sheet URL.")
+        print(f"     ✓ Updated {BATCH_FILE_NAME_TO_EDIT} with new Google Sheet URL.")
 
 
     result, page = enable_github_page(new_repo)
@@ -91,7 +103,7 @@ for repo_data in all_repo_data:
     elif result == "exists":
         print(f"     ✓ GitHub page already enabled: {page['html_url']}")
     elif result == "created":
-        print(f"     ✓ Successfully enabled Github page: {page['html_url']}")
+        print(f"     ✓ Enabled Github Pages link: {page['html_url']}")
 
 
 

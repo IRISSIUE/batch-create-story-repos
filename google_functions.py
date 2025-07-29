@@ -20,7 +20,7 @@ def set_verbose(verbose):
 def authenticate_google_user():
     """Authenticate using OAuth2 user credentials"""
     global GOOGLE_CREDS
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly', 
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 
               'https://www.googleapis.com/auth/drive']
     creds = None
     
@@ -186,20 +186,20 @@ def get_google_file(folder_id, file_name):
         results = DRIVE_SERVICE.files().list(q=query, pageSize=1, fields='files(id,name, webViewLink)').execute()
         items = results.get('files', [])
         if items:
-            return items[0]['webViewLink']
+            return items[0]['id'], items[0]['webViewLink']
         else:
-            return None  # File not found
+            return None, None  # File not found
     except Exception as e:
         print(f"Error checking file existence: {e}")
-        return None
+        return None, None
 
 def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batch_sheet_folder_id=None):
     """Copy the source Google Sheet to a new sheet with the specified name."""
     ensure_google_setup()
 
-    new_sheet_URL = get_google_file(batch_sheet_folder_id, batch_sheet_name)
+    new_sheet_id, new_sheet_URL = get_google_file(batch_sheet_folder_id, batch_sheet_name)
     if new_sheet_URL:
-        return "exists", new_sheet_URL
+        return "exists", new_sheet_id, new_sheet_URL
 
     try:
         copy_body_params = {"name": batch_sheet_name}
@@ -211,9 +211,41 @@ def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batc
             body=copy_body_params
         ).execute()
         
-        new_sheet_URL = copied_sheet["webViewLink"]
-        return "created", new_sheet_URL
+        return "created", copied_sheet["id"], copied_sheet["webViewLink"]
     except Exception as e:
         return "error", e
+    
 
+def share_sheet_with_anyone(sheet_id):
+    """Share sheet to anyone with the link."""
+    ensure_google_setup()
+
+    try:
+        if is_sheet_already_shared(sheet_id) :
+            return "already_shared", None
         
+       # Share with anyone who has the link
+        permission = {
+            'type': 'anyone',
+            'role': 'writer'
+        }
+        
+        DRIVE_SERVICE.permissions().create(
+            fileId=sheet_id,
+            body=permission
+        ).execute()
+        
+        return "shared", None
+        
+    except Exception as e:
+        return "error", e
+    
+def is_sheet_already_shared(sheet_id):
+    """Is a sheet already shared with anyone with a link?"""
+
+    permissions = DRIVE_SERVICE.permissions().list(fileId=sheet_id).execute()
+    for permission in permissions.get('permissions', []):
+        if permission.get('type') == 'anyone':
+            return True
+    return False
+
