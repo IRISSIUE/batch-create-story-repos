@@ -37,15 +37,40 @@ def sanitize_sheet_name(sheet_name):
     """Sanitize the sheet name to remove unwanted characters."""
     return ''.join(char for char in sheet_name if char.isalnum() or char.isspace()).strip()
 
+def print_and_verify_repos_with_user(repo_data):
+    """Print the repo data to user and verify if they want to proceed."""
+    print(f"\n{len(all_repo_data)} projects to be processed from 'input_data_sheet_id' file in the config.yaml:")
+    for data in repo_data:
+        print(f"      Project: \"{data['title']}\" | Students: {data['authors']}")
+
+    print("GitHub repositories and Google data sheets will be created and configured for the projects above, if they do not already exist")
+
+    
+    proceed = input("\nDo you want to proceed with creating these repositories? (yes/no): ").strip().lower()
+    if proceed != "yes":
+        print("Goodbye!")
+        exit(0)
+
+def print_processed_repos():
+    """Print the processed repositories."""
+    print("\n\nProcessed Repositories:")
+    for repo in all_processed_repo_URLs:
+        print(f"  - {repo['title']}:")
+        print(f"      GitHub URL: {repo['github_url']}")
+        print(f"      Google Data Sheet URL: {repo['google_sheet_url']}")
+        print(f"      GitHub Pages URL: {repo['pages_url']}")
+
+
 login_to_github()
 
 all_repo_data = fetch_repo_data_from_google_sheet(INPUT_DATA_SHEET_ID)
-print(f"Fetched {len(all_repo_data)} repository names from Google Sheet.")
-print(all_repo_data)
+print_and_verify_repos_with_user(all_repo_data)
+
+all_processed_repo_URLs = []
 
 for repo_data in all_repo_data:
 
-    print(f"Processing repository: {repo_data['title']}...")
+    print(f"\nProcessing repository: {repo_data['title']}...")
     
     result, new_repo, e = create_repo_from_template(
         template_path=f"{TEMPLATE_REPO_OWNER}/{TEMPLATE_REPO_NAME}",
@@ -122,6 +147,18 @@ for repo_data in all_repo_data:
         print(f"     ✓ Enabled Github Pages link: {page['html_url']}")
 
 
+    # Add the processed repository info to the list
+    repo_info = {
+        'title': repo_data['title'],
+        'github_url':  new_repo.html_url,
+        'google_sheet_url': story_data_sheet_URL,
+        'pages_url': page['html_url']
+    }
+    all_processed_repo_URLs.append(repo_info)
+
+print_processed_repos()
+
+print("\n\nHave a nice day.\n")
 
 exit(0)
 
