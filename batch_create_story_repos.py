@@ -33,6 +33,10 @@ TEMPLATE_SHEET_ID = g_config["template_sheet_id"]
 BATCH_SHEET_NAME_PREFIX = g_config["batch_sheet_name_prefix"]
 BATCH_SHEET_FOLDER_ID = g_config.get("batch_sheet_folder_id", None)
 
+def sanitize_sheet_name(sheet_name):
+    """Sanitize the sheet name to remove unwanted characters."""
+    return ''.join(char for char in sheet_name if char.isalnum() or char.isspace()).strip()
+
 login_to_github()
 
 all_repo_data = fetch_repo_data_from_google_sheet(INPUT_DATA_SHEET_ID)
@@ -61,7 +65,7 @@ for repo_data in all_repo_data:
 
     result, story_data_sheet_id, story_data_sheet_URL, e = copy_story_data_sheet_to_new_sheet(
         template_sheet_id=TEMPLATE_SHEET_ID,
-        batch_sheet_name=f"{BATCH_SHEET_NAME_PREFIX}{repo_data['title']}",
+        batch_sheet_name=sanitize_sheet_name(f"{BATCH_SHEET_NAME_PREFIX}{repo_data['title']}"),
         batch_sheet_folder_id=BATCH_SHEET_FOLDER_ID
     )
     if result == "error":
@@ -81,7 +85,7 @@ for repo_data in all_repo_data:
         print(f"     Error: {str(e)}")
     elif result == "already_shared":
         print(f"     ✓ Google Data sheet already shared with anyone with link")
-    elif result == "updated":
+    elif result == "shared":
         print(f"     ✓ Google Data sheet shared with anyone with link")
 
 

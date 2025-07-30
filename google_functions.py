@@ -208,7 +208,6 @@ def get_google_file(folder_id, file_name) -> tuple:
         else:
             return None, None  # File not found
     except Exception as e:
-        print(f"Error checking file existence: {e}")
         return None, None
 
 def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batch_sheet_folder_id=None) -> tuple:
@@ -235,8 +234,9 @@ def copy_story_data_sheet_to_new_sheet(template_sheet_id, batch_sheet_name, batc
             fileId=template_sheet_id,
             body=copy_body_params
         ).execute()
-        
-        return "created", copied_sheet["id"], copied_sheet["webViewLink"], None
+
+        new_sheet_id, new_sheet_URL = get_google_file(batch_sheet_folder_id, batch_sheet_name)        
+        return "created", new_sheet_id, new_sheet_URL, None
     except Exception as e:
         return "error", None, None, e
     
