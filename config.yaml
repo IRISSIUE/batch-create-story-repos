@@ -5,24 +5,28 @@ github:
 
   # "batch" refers to the repositories that will be created in bulk
 
+  # The batch repositories will be created under this GitHub owner name. The owner can be a user or an organization
   batch_repo_owner: iris-stories
+  # The batch repositories will be created with a prefix, and the input project name will be appended to the prefix
   batch_repo_name_prefix: codes2029
   # The GitHub repo description will have each input project name appended to the prefix 
   batch_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
 
   # After the repository and story data sheet are created, the repo needs to know where to look for the story data sheet
-  # These  are used to edit the right repo file and variable with the new story sheet ID
+  # These vars are used to edit the right repo file and variable with the new story sheet ID
   batch_file_name_to_edit_with_new_story_sheet_id: "google-sheet-config.js"
   batch_file_variable_to_edit_with_new_data_sheet_id: "googleSheetURL"
 
 google:
   # The Google Sheet that contains the input data for the batch creation
-  # The input data file will have a project name and students (authors) assigned to each repo to be created
+  # The input data file contains project name and students (authors) assigned to each repo to be created
   # Students/Authors are optional, and not needed to create repos, but will be added to the story data if provided
-  # The format of the data sheet is the first row is headers, and all subsequent rows are data.
-  # The first column is the project name and all subsequent columns are the students/authors for that project
-  # ID is in the Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
-  input_data_sheet_id: "1jYXgbcORImT_W63tnTbgJJeDCWfc8wqnb0RZWodwZN4"
+  # The input data sheet should have the following structure:
+  # - Only the first sheet is read
+  # - The first row is headers: "Project Name", "Student 1", "Student 2", etc.
+  # - All subsequent rows are data for each project
+  # The ID to enter below is in the input data Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
+  input_data_sheet_id: "XXXXXXXXXXXXX"
 
   # The Google Sheet with story data that will be copied for each batch story repo
   # ID is in the Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
