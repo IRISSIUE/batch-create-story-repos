@@ -1,7 +1,7 @@
-.auth 
-credentials.json
-token.json
-env.py
+
+.auth/credentials.json
+.auth/token.json
+.auth/env.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
