@@ -35,12 +35,10 @@ def authenticate_google_user() -> None:
     # If there are no (valid) credentials available, let the user log in
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            if VERBOSE:
-                print("Refreshing expired credentials...")
+            print("Refreshing expired credentials...")
             creds.refresh(Request())
         else:
-            if VERBOSE:
-                print("No valid credentials found. Opening browser for authentication...")
+            print("No valid credentials found. Opening browser for authentication...")
             try:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     '.auth/credentials.json', SCOPES)  # These are the OAuth2 client secrets
@@ -58,27 +56,29 @@ def authenticate_google_user() -> None:
         with open('.auth/token.json', 'w') as token:
             print("Saving new credentials to .auth/token.json...")
             token.write(creds.to_json())
-    if VERBOSE:
-        print(f"Google user authenticated successfully")
+    print(f"Google user authenticated successfully")
     GOOGLE_CREDS = creds
 
 def ensure_google_setup() -> None:
     """Set up Google Sheets and Drive services using the authenticated credentials."""
     global SHEETS_SERVICE, DRIVE_SERVICE
-    if GOOGLE_CREDS is None:
-        authenticate_google_user()
-
-    if GOOGLE_CREDS is None:
-        print("Error: Cannot set up Google services: Failed to authenticate with Google")
-        exit(1)
-
     try:
+        if GOOGLE_CREDS is None:
+            authenticate_google_user()
+
+        if GOOGLE_CREDS is None:
+            print("Error: Cannot set up Google services: Failed to authenticate with Google")
+            print("If your credentials have expired, delete the .auth/token.json file and try again.")
+            exit(1)
+
+
         if SHEETS_SERVICE is None:
             SHEETS_SERVICE = build("sheets", "v4", credentials=GOOGLE_CREDS)
         if DRIVE_SERVICE is None:
             DRIVE_SERVICE = build("drive", "v3", credentials=GOOGLE_CREDS)
     except Exception as e:
         print(f"Error setting up Google services: {e}")
+        print("If your credentials have expired, delete the .auth/token.json file and try again.")
         exit(1)
 
 def sanitize_repo_name(repo_name):
@@ -286,9 +286,9 @@ def edit_sheet_with_project_info(sheet_id, project_name, authors) -> tuple:
         error_message is the error message if an error occurred, otherwise None.
     """
 
-    ensure_google_setup()
-
     try:
+        ensure_google_setup()
+
         # Update the Scrolly Story Title cell
         SHEETS_SERVICE.spreadsheets().values().update(
             spreadsheetId=sheet_id,
