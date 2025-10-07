@@ -1,21 +1,21 @@
 github:
   # "template" is the repository that will be copied from in order to create new repositories
-  template_repo_owner: HandsOnDataViz
-  template_repo_name: leaflet-storymaps-with-google-sheets
+  template_repo_owner: IRISSIUE
+  template_repo_name: scrolly-story-generator
 
   # "batch" refers to the repositories that will be created in bulk
 
   # The batch repositories will be created under this GitHub owner name. The owner can be a user or an organization
   batch_repo_owner: iris-stories
   # The batch repositories will be created with a prefix, and the input project name will be appended to the prefix
-  batch_repo_name_prefix: codes2029-storymap
+  batch_repo_name_prefix: codes2029
   # The GitHub repo description will have each input project name appended to the prefix 
-  batch_repo_description_prefix: "Leaflet Story Map for CODES 2029 students: "
+  batch_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
 
   # After the repository and story data sheet are created, the repo needs to know where to look for the story data sheet
   # These vars are used to edit the right repo file and variable with the new story sheet ID
-  batch_file_name_to_edit_with_new_story_sheet_id: "google-doc-url.js"
-  batch_file_variable_to_edit_with_new_data_sheet_id: "googleDocURL"
+  batch_file_name_to_edit_with_new_story_sheet_id: "google-sheet-config.js"
+  batch_file_variable_to_edit_with_new_data_sheet_id: "googleSheetURL"
 
 google:
   # The Google Sheet that contains the input data for the batch creation
@@ -26,20 +26,20 @@ google:
   # - The first row is headers: "Project Name", "Student 1", "Student 2", etc.
   # - All subsequent rows are data for each project
   # The ID to enter below is in the input data Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
-  input_data_sheet_id: "1r4fg29ql7px7MSgNkJymmvuEX726J9EONh0kEagkdJc"
+  input_data_sheet_id: "XXXXXXXXXXXXX"
 
   # The Google Sheet with story data that will be copied for each batch story repo
   # ID is in the Sheeet URL: https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXX
-  template_sheet_id: "1AO6XHL_0JafWZF4KEejkdDNqfuZWUk3SlNlQ6MjlRFM"
+  template_sheet_id: "17sHlHcOilG9UmRju8YDGx4bRMIDpQ5Bpfzc0QI-Np6c"
 
   # The prefix to prepend to the project name for each new Google Sheet created for each batch story repo
   # E.g., each new story data sheet created will have a name like "Scrolly Story [Project Name]"
-  batch_sheet_name_prefix: "Leaflet Story Map "
+  batch_sheet_name_prefix: "Scrolly Story "
 
   # The folder ID in Google Drive where the new story data sheets will be created
   # if not provided, the new sheets will be created in the root of the user's Google Drive
   # ID is in the folder URL: https://drive.google.com/drive/u/3/folders/XXXXXXX
-  batch_sheet_folder_id: "1wvbTG-EG8sZDcy4tgEh1IPXe5byMyzAR"
+  batch_sheet_folder_id: "1dKgWFk5NrGg6oZwAOpaHQSeKB3icvIsg"
 
 
 
