@@ -136,17 +136,34 @@ def convert_author_names_to_list(author_columns) -> str:
 
     return ", ".join(author_names)
 
+def find_header_row_index(sheet_values, header_name) -> int:
+    """Find the index of the header row containing the specified header name.
+    
+    Returns the index of the header row, or -1 if not found.
+    """
+    if not sheet_values or sheet_values[0] is None:
+        return -1
+    header = sheet_values[0]  # Assuming the first row is the header row
+    for index, col_name in enumerate(header):
+        if header_name.lower().strip() == col_name.lower().strip():
+            return index
+    return -1
+
 def convert_sheet_values_to_repo_names_and_authors(sheet_values) -> list:
     """Convert Google Sheet values to a list of repository names.
     
     Returns a list of dictionaries with 'title', 'repo-name', and 'authors' keys.
     """
+    project_name_col_index = find_header_row_index(sheet_values, "Project Name")
+    if project_name_col_index == -1:
+        print("Error: 'Project Name' column not found in the Google Sheet.")
+        return []
     converted_data = []
-    for row in sheet_values:
+    for row in sheet_values[1:]:  # Skip header row
         if row:  
-            original_name = row[0].strip() if row[0] else "" # First column is the repository name
-            repo_name = sanitize_repo_name(row[0])  
-            student_names = convert_author_names_to_list(row[1:]) # Subsequent columns are one column per author
+            original_name = row[project_name_col_index].strip() if row[0] else "" # project name is the repository title
+            repo_name = sanitize_repo_name(original_name)  
+            student_names = convert_author_names_to_list(row[project_name_col_index+1:]) # Subsequent columns are one column per author
     
             repo_data = {
                 "title": original_name,
@@ -186,8 +203,7 @@ def fetch_repo_data_from_google_sheet(google_sheet_id) -> list:
         print("No data found in the Google Sheet that is supposed to have repository and author names.")
         return []
     
-    # skip the header row and convert the rest
-    return convert_sheet_values_to_repo_names_and_authors(sheet1_values[1:])
+    return convert_sheet_values_to_repo_names_and_authors(sheet1_values)
 
 def get_google_file(folder_id, file_name) -> tuple:
     """Check if a file with the given name exists in the specified Google Drive folder.
