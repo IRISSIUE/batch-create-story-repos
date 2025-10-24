@@ -160,11 +160,14 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values) -> list:
         return []
     converted_data = []
     for row in sheet_values[1:]:  # Skip header row
-        if row:  
-            original_name = row[project_name_col_index].strip() if row[0] else "" # project name is the repository title
+         if row:  
+            
+            original_name = ""
+            if project_name_col_index < len(row) and row[project_name_col_index]:
+                original_name = row[project_name_col_index].strip()
             repo_name = sanitize_repo_name(original_name)  
             student_names = convert_author_names_to_list(row[project_name_col_index+1:]) # Subsequent columns are one column per author
-    
+            
             repo_data = {
                 "title": original_name,
                 "repo-name": repo_name,
