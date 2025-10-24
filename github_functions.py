@@ -20,7 +20,7 @@ def login_to_github():
                 " both the template repository and the organization where you will create the new repositories (template_repo_name and batch_repo_owner in config.yaml).")
         print("You can set the token in your enviornment by invoking the commands:")
         print("Unix/Linux/macOS: 'export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXX'")
-        print("Windows: 'set GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXX' or '$env:GITHUB_TOKEN=""ghp_XXXXXXXXXXXXXXXXXX""' ")
+        print("Windows: 'set GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXX' or '$env:GITHUB_TOKEN=" +'"ghp_XXXXXXXXXXXXXXXXXX"')
         exit(1)
 
     # This authenticates (logs in) the user using the provided token
