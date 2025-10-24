@@ -41,7 +41,7 @@ def print_and_verify_repos_with_user(repo_data):
     """Print the repo data to user and verify if they want to proceed."""
     print(f"\n{len(all_repo_data)} projects to be processed from 'input_data_sheet_id' file in the config.yaml:")
     for data in repo_data:
-        print(f"      Project: \"{data['title']}\" | Students: {data['authors']}")
+        print(f"      Project: \"{data['title']}\" | Repo: {data['repo-name']} | Students: {data['authors']}")
 
     print("GitHub repositories and Google data sheets will be created and configured for the projects above, if they do not already exist")
 
