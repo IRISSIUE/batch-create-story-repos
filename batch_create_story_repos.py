@@ -1,4 +1,6 @@
 import yaml
+import os
+from datetime import datetime
 
 from google_functions import fetch_repo_data_from_google_sheet
 from google_functions import copy_story_data_sheet_to_new_sheet
@@ -33,6 +35,8 @@ TEMPLATE_SHEET_ID = g_config["template_sheet_id"]
 BATCH_SHEET_NAME_PREFIX = g_config["batch_sheet_name_prefix"]
 BATCH_SHEET_FOLDER_ID = g_config.get("batch_sheet_folder_id", None)
 
+SUMMARY_HTML_FILE = "batch_summary"
+
 def sanitize_sheet_name(sheet_name):
     """Sanitize the sheet name to remove unwanted characters."""
     return ''.join(char for char in sheet_name if char.isalnum() or char.isspace()).strip()
@@ -56,9 +60,74 @@ def print_processed_repos():
     print("\n\nProcessed Repositories:")
     for repo in all_processed_repo_URLs:
         print(f"  - {repo['title']}:")
-        print(f"      GitHub URL: {repo['github_url']}")
         print(f"      Google Data Sheet URL: {repo['google_sheet_url']}")
         print(f"      GitHub Pages URL: {repo['pages_url']}")
+        print(f"      GitHub URL: {repo['github_url']}")
+
+
+def output_summary_to_html_file(repos):
+    """Update or create a local HTML summary file with the processed repositories."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    filename = SUMMARY_HTML_FILE + now.replace(" ", "_").replace(":", "-") + ".html"
+    
+    # Header
+    html_content = f"""
+    <div class="batch-run">
+        <h2 style="border-bottom: 2px solid #333; padding-top: 20px;">Batch Processed on: {now}</h2>
+    """
+    
+    # Repository details for every processed repository
+    for repo in repos:
+        html_content += f"""
+        <div class="project" style="margin-bottom: 30px; padding: 10px; border: 1px solid #ddd; border-top: 2px solid #333; background-color: #fff;">
+            <h3 style="margin: 0 0 5px 0; color: #000; text-decoration: none; border-bottom: 2px solid #eee; padding-bottom: 4px;">{repo['title']}</h3>
+            
+            <div style="margin: 0; padding: 0; line-height: 1.2;">
+                <div style="margin-bottom: 4px; text-decoration: none;">
+                    <a href="{repo['google_sheet_url']}" target="_blank" style="color: #1155cc; text-decoration: underline; font-weight: bold;">Google Data Sheet</a>: 
+                    <span style="color: #444; font-size: 0.95em; text-decoration: none;">The source data for the story, used to edit content and settings.</span>
+                </div>
+                
+                <div style="margin-bottom: 4px; text-decoration: none;">
+                    <a href="{repo['pages_url']}" target="_blank" style="color: #1155cc; text-decoration: underline; font-weight: bold;">Public Story Site</a>: 
+                    <span style="color: #444; font-size: 0.95em; text-decoration: none;">The live, published version of the story.</span>
+                </div>
+                
+                <div style="margin-bottom: 4px; text-decoration: none;">
+                    <a href="{repo['github_url']}" target="_blank" style="color: #1155cc; text-decoration: underline; font-weight: bold;">GitHub Repository</a>: 
+                    <span style="color: #444; font-size: 0.95em; text-decoration: none;">The git repository containing the source code and configuration.</span>
+                </div>
+            </div>
+        </div>
+        <br style="text-decoration: none;">
+        """
+    
+    html_content += "</div>"
+    
+
+    # Create  file with basic HTML structure
+    html_template = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Creation Summary</title>
+    <style>
+        body {{ font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }}
+        .batch-run {{ background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; }}
+        h1 {{ color: #2c3e50; text-align: center; }}
+        a {{ color: #3498db; text-decoration: none; }}
+        a:hover {{ text-decoration: underline; }}
+    </style>
+</head>
+<body>
+    <h1>Batch Repository Summaries</h1>
+    {html_content}
+</body>
+</html>"""
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(html_template)
+    print(f"\n✓ Local summary file created: {SUMMARY_HTML_FILE}")
 
 
 login_to_github()
@@ -157,6 +226,7 @@ for repo_data in all_repo_data:
     all_processed_repo_URLs.append(repo_info)
 
 print_processed_repos()
+output_summary_to_html_file(all_processed_repo_URLs)
 
 print("\n\nHave a nice day.\n")
 
