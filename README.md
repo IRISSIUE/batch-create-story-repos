@@ -1,16 +1,16 @@
 # Overview
 This script reads a list of project names and students from a spreadsheet
-and batch creates/configures GitHub repositories and Google Data Sheets copied from a template, which is a general way of saying that it sets up a class of student to use one of:
+and batch creates/configures GitHub repositories and Google Data Sheets copied from a template. Specifically, it sets up data for a class of students to use one of:
 * The Scrolly Story Generator
 * Leaflet StoryMaps
 
-both of which work by copying their GitHub repositories and a sample google 
-sheets, one per project, to a place where the students can easily access them.
+both of which work by copying their respective GitHub templates repositories and a sample google 
+sheet, one per project, to a place where the students can access and edit them to create their story projects.
 
 ## Configuring the script
 The script requires a lot of configuration before being run:
-1. **Config.yaml**. Most input variables are specified in the config.yaml file that is included in the project. The variables here control what is copied and how to configure the projects for use in a classroom by students. The yaml file explains what each parameter does, and has a variable for where to find the Input Google Sheet (below).
-2. **The Input Google Sheet**. You need to create a spreadsheet of input data that contains every project name plus the students assigned to the project. This script creates a GitHub Repository and Google Data Sheet for each, customized to work for that project. Note that the (script) Google Input Sheet is different from the (project) Google Data Sheet. There is one Google Input sheet containing all the project names, and one Google Data Sheet created for each project in the input sheet.
+1. **Config.yaml**. Most input variables are specified in the config.yaml file that is included in the project. The variables here control which repositories/files are copied and how to configure the projects for use in a classroom by students. The yaml file explains what each parameter does, and has a variable for where to find the Input Google Sheet (below).<br/><br/>This  project has 2 sample config.yaml files for SIUE CODEs projects, one for creating Scrolly Story projects and one for creating Leaflet StoryMap projects. You can copy one of those files over "config.yaml" to create the one you want
+2. **The Input Google Sheet**. You need to create a spreadsheet of input data that contains every project name plus the students assigned to the project. This script creates a GitHub Repository and Google Data Sheet for each entry in this file, customized to work for that project. Note that the (script) Google Input Sheet is different from the (project) Google Data Sheet. There is one Google Input sheet containing all the project names, and one Google Data Sheet created for each project in the input sheet.
 3. **GitHub Token**. In order to create and modify a GitHub repository, you need to provide your GitHub Personal Access Token. For security reasons, this should never be stored in a .yaml file or input as a command line argument, so you'll have to set it as an environment variable for the script to read. Use one of the following commands to do this before running the script:
 Set your GitHub Personal Access Token as an environment variable:
 ```bash
@@ -27,7 +27,7 @@ export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXX
 ## Permissions
 
 In order to create the google data sheets required by a Scrolly or Leaflet Story, this script needs permission to
-create those sheets the google drive specified in your configuration parameters.
+create those sheets in the google drive specified in your configuration parameters.
 
 In the case of SIUE CODES students, this is the IRISSIUE google account, which has folders organized in [its Google Drive](https://drive.google.com/drive/u/3/my-drive) that contain the data sheets. You'll need the IRISSIUE password to generate these. When you run the script, you'll be asked to login to IRISSIUE.
 
@@ -41,7 +41,7 @@ The first time you run this script, you'll also need a "credentials.json" file t
  
  If you're not running the script for the SIUE CODEs program, you'll have to create this credentials file in Google and place it in the ./auth folder of this project. Once you create it, you won't have to worry about it again, unless you lose the credentials.json file or the permissions need to change for some reason. Then you'll have to recreate it. 
 
- Make sure the google account you are using has access to the Input Google Sheet and the template Google Data Sheet this project is copying, as well as access to the parent folder in which you plan to create the Google Data Sheets.
+ Make sure the google account you are using has access to the Input Google Sheet and the template Google Data Sheet this project is copying, as well as access to the parent Google folder in which you plan to create the Google Data Sheets.
 
 For Google OAuth2, you create a credentials.json file from the Google Cloud Console: 
 
@@ -62,15 +62,10 @@ For Google OAuth2, you create a credentials.json file from the Google Cloud Cons
 
 **Login Token**
 
-When you login using OAuth2 (logging in via Google), it will create a "token.json" file and put it in the ./auth folder of this project. This saves your login information (not your password, but a token) for a limited amount of time that allows you to run the script again without having to login in again.
+When you login using OAuth2 (logging in via Google), it will create a "token.json" file and put it in the ./auth folder of this project. This saves your login information (not your password, but a token). The token is valid for a limited amount of time and allows you to run the script without having to login in again.
 
 This token eventually expires, and if so, you'll get a message to delete the token.json file, the only side effect of doing so is that you'll have to login again. 
 
-##TO DO
-
-* Verbose Mode
-* Batch Summary File Creation
-* Default Configurations for each project type
 
 ## Running the Script
 
@@ -83,3 +78,9 @@ pip install PyGithub google-api-python-client google-auth google-auth-oauthlib P
  py .\batch_create_story_repos.py
 ```
 
+The script will first list all the projects that it will create based on the input, and give you a chance to cancel before proceeding.
+
+### Batch Summary File
+After a successful run, an output file is created with a "batch_summary" prefix following by the datetime the script was run.
+
+The output file contains a list of all the repositories and files created by the script and can be distributed to the class of students so they know where to find their project files. 
