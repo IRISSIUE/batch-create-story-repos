@@ -298,7 +298,7 @@ def is_sheet_already_shared(sheet_id):
             return True
     return False
 
-def edit_sheet_with_project_info(sheet_id, project_name, authors) -> tuple:
+def edit_sheet_with_project_info(sheet_id, cell_for_project_name, project_name, cell_for_authors, authors) -> tuple:
     """Edit the Google Sheet with the project name and authors.
     Returns a tuple of (result, error_message).
         result can be "updated" or "error"
@@ -308,10 +308,10 @@ def edit_sheet_with_project_info(sheet_id, project_name, authors) -> tuple:
     try:
         ensure_google_setup()
 
-        # Update the Scrolly Story Title cell
+        # Update the Scrolly Story Title/Project cell
         SHEETS_SERVICE.spreadsheets().values().update(
             spreadsheetId=sheet_id,
-            range="Story!B2",  # The Title of the Scrolly Story
+            range=cell_for_project_name,
             valueInputOption="RAW", 
             body={
                 "values": [[project_name]] 
@@ -321,7 +321,7 @@ def edit_sheet_with_project_info(sheet_id, project_name, authors) -> tuple:
         # Update the Scrolly Story Authors cell
         SHEETS_SERVICE.spreadsheets().values().update(
             spreadsheetId=sheet_id,
-            range="Story!D2",  # The Authors field
+            range=cell_for_authors,
             valueInputOption="RAW",
             body={
                 "values": [[authors]]

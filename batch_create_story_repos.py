@@ -27,6 +27,8 @@ BATCH_REPO_NAME_PREFIX = gh_config["batch_repo_name_prefix"]
 BATCH_REPO_DESCRIPTION_PREFIX = gh_config["batch_repo_description_prefix"]
 BATCH_FILE_NAME_TO_EDIT = gh_config["batch_file_name_to_edit_with_new_story_sheet_id"]
 BATCH_FILE_VARIABLE_TO_EDIT = gh_config["batch_file_variable_to_edit_with_new_data_sheet_id"]
+BATCH_CELL_TO_EDIT_WITH_PROJECT_NAME = gh_config["batch_cell_to_edit_with_project_name"]
+BATCH_CELL_TO_EDIT_WITH_AUTHORS = gh_config["batch_cell_to_edit_with_authors"]  
 
 # Google config
 g_config = config["google"]
@@ -127,7 +129,7 @@ def output_summary_to_html_file(repos):
 </html>"""
     with open(filename, "w", encoding="utf-8") as f:
         f.write(html_template)
-    print(f"\n✓ Local summary file created: {SUMMARY_HTML_FILE}")
+    print(f"\n✓ Local summary file created: {filename}")
 
 
 login_to_github()
@@ -183,7 +185,7 @@ for repo_data in all_repo_data:
         print(f"     ✓ Google Data sheet shared with anyone with link")
 
 
-    result, e = edit_sheet_with_project_info(story_data_sheet_id, repo_data['title'], repo_data['authors'])
+    result, e = edit_sheet_with_project_info(story_data_sheet_id, BATCH_CELL_TO_EDIT_WITH_PROJECT_NAME, repo_data['title'], BATCH_CELL_TO_EDIT_WITH_AUTHORS, repo_data['authors'])
     if result == "error":
         print(f"     ❌ Failed to update data sheet with story title and authors")
         print(f"     Error: {str(e)}")

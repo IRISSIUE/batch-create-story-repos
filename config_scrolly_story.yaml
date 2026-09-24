@@ -17,6 +17,11 @@ github:
   batch_file_name_to_edit_with_new_story_sheet_id: "google-sheet-config.js"
   batch_file_variable_to_edit_with_new_data_sheet_id: "googleSheetURL"
 
+  # For each data spreadsheet created, we want to personalize the project name and authors in the sheet
+  batch_cell_to_edit_with_project_name: "Story!B2"
+  batch_cell_to_edit_with_authors: "Story!D2"
+
+
 google:
   # The Google Sheet that contains the input data for the batch creation
   # The input data file contains project name and students (authors) assigned to each repo to be created
