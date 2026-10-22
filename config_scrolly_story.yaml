@@ -8,9 +8,9 @@ github:
   # The batch repositories will be created under this GitHub owner name. The owner can be a user or an organization
   batch_repo_owner: iris-stories
   # The batch repositories will be created with a prefix, and the input project name will be appended to the prefix
-  batch_repo_name_prefix: codes2029
+  batch_repo_name_prefix: codes2026-scrolly-
   # The GitHub repo description will have each input project name appended to the prefix 
-  batch_repo_description_prefix: "Scrolly Story for CODES 2029 cohort, Project: "
+  batch_repo_description_prefix: "Scrolly Story for CODES121 2026 students, Project: "
 
   # After the repository and story data sheet are created, the repo needs to know where to look for the story data sheet
   # These vars are used to edit the right repo file and variable with the new story sheet ID

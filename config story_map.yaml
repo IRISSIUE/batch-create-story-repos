@@ -1,16 +1,16 @@
 github:
   # "template" is the repository that will be copied from in order to create new repositories
-  template_repo_owner: HandsOnDataViz
-  template_repo_name: leaflet-storymaps-with-google-sheets
+  template_repo_owner: IRISSIUE
+  template_repo_name: extended-leaflet-storymaps
 
   # "batch" refers to the repositories that will be created in bulk
 
   # The batch repositories will be created under this GitHub owner name. The owner can be a user or an organization
   batch_repo_owner: iris-stories
   # The batch repositories will be created with a prefix, and the input project name will be appended to the prefix
-  batch_repo_name_prefix: codes2030-storymap
+  batch_repo_name_prefix: codes2026-storymap
   # The GitHub repo description will have each input project name appended to the prefix 
-  batch_repo_description_prefix: "Leaflet Story Map for CODES 2030 students: "
+  batch_repo_description_prefix: "Leaflet Story Map for CODES 2026 students: "
 
   # After the repository and story data sheet are created, the repo needs to know where to look for the story data sheet
   # These vars are used to edit the right repo file and variable with the new story sheet ID
