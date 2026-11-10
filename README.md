@@ -10,7 +10,12 @@ sheet, one per project, to a place where the students can access and edit them t
 ## Configuring the script
 The script requires a lot of configuration before being run:
 1. **Config.yaml**. Most input variables are specified in the config.yaml file that is included in the project. The variables here control which repositories/files are copied and how to configure the projects for use in a classroom by students. The yaml file explains what each parameter does, and has a variable for where to find the Input Google Sheet (below).<br/><br/>This  project has 2 sample config.yaml files for SIUE CODEs projects, one for creating Scrolly Story projects and one for creating Leaflet StoryMap projects. You can copy one of those files over "config.yaml" to create the one you want
-2. **The Input Google Sheet**. You need to create a spreadsheet of input data that contains every project name plus the students assigned to the project. This script creates a GitHub Repository and Google Data Sheet for each entry in this file, customized to work for that project. Note that the (script) Google Input Sheet is different from the (project) Google Data Sheet. There is one Google Input sheet containing all the project names, and one Google Data Sheet created for each project in the input sheet.
+2. **The Input Google Sheet**. You need to create a spreadsheet of input data that contains information for every project. Each line needs the following colums:
+    * Project Name: The name that will be used as the github repository name and the input file name
+    * Project Title: A full project title/descriptiont that will be used as the title within the story. If omitted, just uses the Project Name.
+    * Students: One column per student (author) assigned to the project, to be used within the story as the authors
+
+     The script creates a GitHub Repository and Google Data Sheet for each entry in this file, customized to work for that project. Note that the (script) Google Input Sheet is different from the (project) Google Data Sheet. There is one Google Input sheet containing all the project names, and one Google Data Sheet created for each project in the input sheet.
 3. **GitHub Token**. In order to create and modify a GitHub repository, you need to provide your GitHub Personal Access Token. For security reasons, this should never be stored in a .yaml file or input as a command line argument, so you'll have to set it as an environment variable for the script to read. Use one of the following commands to do this before running the script:
 Set your GitHub Personal Access Token as an environment variable:
 ```bash
