@@ -27,7 +27,7 @@ BATCH_REPO_NAME_PREFIX = gh_config["batch_repo_name_prefix"]
 BATCH_REPO_DESCRIPTION_PREFIX = gh_config["batch_repo_description_prefix"]
 BATCH_FILE_NAME_TO_EDIT = gh_config["batch_file_name_to_edit_with_new_story_sheet_id"]
 BATCH_FILE_VARIABLE_TO_EDIT = gh_config["batch_file_variable_to_edit_with_new_data_sheet_id"]
-BATCH_CELL_TO_EDIT_WITH_PROJECT_NAME = gh_config["batch_cell_to_edit_with_project_name"]
+BATCH_CELL_TO_EDIT_WITH_PROJECT_TITLE = gh_config["batch_cell_to_edit_with_project_title"]
 BATCH_CELL_TO_EDIT_WITH_AUTHORS = gh_config["batch_cell_to_edit_with_authors"]  
 
 # Google config
@@ -47,7 +47,7 @@ def print_and_verify_repos_with_user(repo_data):
     """Print the repo data to user and verify if they want to proceed."""
     print(f"\n{len(all_repo_data)} projects to be processed from 'input_data_sheet_id' file in the config.yaml:")
     for data in repo_data:
-        print(f"      Project: \"{data['title']}\" | Repo: {data['repo-name']} | Students: {data['authors']}")
+        print(f"      Project: \"{data['project-title']}\" | Repo: {data['repo-name']} | Students: {data['authors']}")
 
     print("GitHub repositories and Google data sheets will be created and configured for the projects above, if they do not already exist")
 
@@ -61,7 +61,7 @@ def print_processed_repos():
     """Print the processed repositories."""
     print("\n\nProcessed Repositories:")
     for repo in all_processed_repo_URLs:
-        print(f"  - {repo['title']}:")
+        print(f"  - {repo['project-title']}:")
         print(f"      Google Data Sheet URL: {repo['google_sheet_url']}")
         print(f"      GitHub Pages URL: {repo['pages_url']}")
         print(f"      GitHub URL: {repo['github_url']}")
@@ -82,8 +82,8 @@ def output_summary_to_html_file(repos):
     for repo in repos:
         html_content += f"""
         <div class="project" style="margin-bottom: 30px; padding: 10px; border: 1px solid #ddd; border-top: 2px solid #333; background-color: #fff;">
-            <h3 style="margin: 0 0 5px 0; color: #000; text-decoration: none; border-bottom: 2px solid #eee; padding-bottom: 4px;">{repo['title']}</h3>
-            
+            <h3 style="margin: 0 0 5px 0; color: #000; text-decoration: none; border-bottom: 2px solid #eee; padding-bottom: 4px;">{repo['project-title']}</h3>
+            <div style="margin-bottom: 5px; font-size: 0.70em;">Authors: {repo['authors']}</div>
             <div style="margin: 0; padding: 0; line-height: 1.2;">
                 <div style="margin-bottom: 4px; text-decoration: none;">
                     <a href="{repo['google_sheet_url']}" target="_blank" style="color: #1155cc; text-decoration: underline; font-weight: bold;">Google Data Sheet</a>: 
@@ -141,13 +141,13 @@ all_processed_repo_URLs = []
 
 for repo_data in all_repo_data:
 
-    print(f"\nProcessing repository: {repo_data['title']}...")
+    print(f"\nProcessing repository: {repo_data['project-name']}...")
     
     result, new_repo, e = create_repo_from_template(
         template_path=f"{TEMPLATE_REPO_OWNER}/{TEMPLATE_REPO_NAME}",
         batch_repo_owner=BATCH_REPO_OWNER,
         batch_repo_name=f"{BATCH_REPO_NAME_PREFIX}-{repo_data['repo-name']}",    
-        batch_repo_description=f"{BATCH_REPO_DESCRIPTION_PREFIX} {repo_data['title']}")
+        batch_repo_description=f"{BATCH_REPO_DESCRIPTION_PREFIX} {repo_data['project-title']}")
     if result == "error":
         print(f"     ❌ Failed to create GitHub repository for {repo_data['title']}")
         print(f"     Error: {str(e)}")
@@ -161,7 +161,7 @@ for repo_data in all_repo_data:
 
     result, story_data_sheet_id, story_data_sheet_URL, e = copy_story_data_sheet_to_new_sheet(
         template_sheet_id=TEMPLATE_SHEET_ID,
-        batch_sheet_name=sanitize_sheet_name(f"{BATCH_SHEET_NAME_PREFIX}{repo_data['title']}"),
+        batch_sheet_name=sanitize_sheet_name(f"{BATCH_SHEET_NAME_PREFIX}{repo_data['project-name']}"),
         batch_sheet_folder_id=BATCH_SHEET_FOLDER_ID
     )
     if result == "error":
@@ -185,7 +185,7 @@ for repo_data in all_repo_data:
         print(f"     ✓ Google Data sheet shared with anyone with link")
 
 
-    result, e = edit_sheet_with_project_info(story_data_sheet_id, BATCH_CELL_TO_EDIT_WITH_PROJECT_NAME, repo_data['title'], BATCH_CELL_TO_EDIT_WITH_AUTHORS, repo_data['authors'])
+    result, e = edit_sheet_with_project_info(story_data_sheet_id, BATCH_CELL_TO_EDIT_WITH_PROJECT_TITLE, repo_data['project-title'], BATCH_CELL_TO_EDIT_WITH_AUTHORS, repo_data['authors'])
     if result == "error":
         print(f"     ❌ Failed to update data sheet with story title and authors")
         print(f"     Error: {str(e)}")
@@ -220,10 +220,11 @@ for repo_data in all_repo_data:
 
     # Add the processed repository info to the list
     repo_info = {
-        'title': repo_data['title'],
+        'project-title': repo_data['project-title'],
         'github_url':  new_repo.html_url,
         'google_sheet_url': story_data_sheet_URL,
-        'pages_url': page['html_url']
+        'pages_url': page['html_url'],
+        'authors': repo_data['authors']
     }
     all_processed_repo_URLs.append(repo_info)
 

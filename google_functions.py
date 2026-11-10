@@ -152,9 +152,11 @@ def find_header_row_index(sheet_values, header_name) -> int:
 def convert_sheet_values_to_repo_names_and_authors(sheet_values) -> list:
     """Convert Google Sheet values to a list of repository names.
     
-    Returns a list of dictionaries with 'title', 'repo-name', and 'authors' keys.
+    Returns a list of dictionaries with 'project-name', 'repo-name', 'project-title', and 'authors' keys.
     """
     project_name_col_index = find_header_row_index(sheet_values, "Project Name")
+    project_title_col_index = find_header_row_index(sheet_values, "Project Title")
+
     if project_name_col_index == -1:
         print("Error: 'Project Name' column not found in the Google Sheet.")
         return []
@@ -166,11 +168,13 @@ def convert_sheet_values_to_repo_names_and_authors(sheet_values) -> list:
             if project_name_col_index < len(row) and row[project_name_col_index]:
                 original_name = row[project_name_col_index].strip()
             repo_name = sanitize_repo_name(original_name)  
-            student_names = convert_author_names_to_list(row[project_name_col_index+1:]) # Subsequent columns are one column per author
+            project_title = row[project_title_col_index] if (project_title_col_index < len(row) and row[project_title_col_index]) else original_name
+            student_names = convert_author_names_to_list(row[project_title_col_index+1:]) # Subsequent columns are one column per author
             
             repo_data = {
-                "title": original_name,
+                "project-name": original_name,
                 "repo-name": repo_name,
+                "project-title": project_title,
                 "authors": student_names
             }
             converted_data.append(repo_data)
